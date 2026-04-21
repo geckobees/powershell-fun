@@ -6,7 +6,7 @@ param(
 )   
 $totalGens      = 500    
 $pauseMs        = 20    
-
+$liveCellCounter = 0
 
 
 function New-RandomGrid {
@@ -69,12 +69,15 @@ function Get-NextGeneration {
 
             if ($isAlive -eq 1 -and ($neighbors -eq 2 -or $neighbors -eq 3)) {
                 $nextRow += 1
+                $LiveCellCounter += 1
             }
             elseif ($isAlive -eq 0 -and $neighbors -eq 3) {
                 $nextRow += 1
+                $liveCellCounter += 1
             }
             else {
-                $nextRow += 0   
+                $nextRow += 0
+                $liveCellCounter -= 1
             }
         }
 
