@@ -1,8 +1,11 @@
 
-$gridWidth      = 40  
-$gridHeight     = 40     
-$totalGens      = 100    
-$pauseMs        = 15    
+param(
+    [int]$gridWidth  = 40,    
+    [int]$gridHeight = 20,
+    [String]$title = "Ruslan"
+)   
+$totalGens      = 500    
+$pauseMs        = 20    
 
 
 
@@ -55,19 +58,20 @@ function Get-NextGeneration {
     param($currentGrid)
 
     $nextGrid = @()   
-
+    $changes = 0
     for ($row = 0; $row -lt $gridHeight; $row++) {
         $nextRow = @()
+        
 
         for ($col = 0; $col -lt $gridWidth; $col++) {
             $isAlive   = $currentGrid[$row][$col]
             $neighbors = Count-LiveNeighbors -grid $currentGrid -row $row -col $col
 
             if ($isAlive -eq 1 -and ($neighbors -eq 2 -or $neighbors -eq 3)) {
-                $nextRow += 1   
+                $nextRow += 1
             }
             elseif ($isAlive -eq 0 -and $neighbors -eq 3) {
-                $nextRow += 1   
+                $nextRow += 1
             }
             else {
                 $nextRow += 0   
@@ -94,18 +98,17 @@ function Show-Grid {
 
     $frame = [System.Text.StringBuilder]::new()
 
-    $null = $frame.AppendLine("Generation $generation of $totalGens   (Press Ctrl+C to quit)")
-
+    $null = $frame.appendLine("Game of life")
     for ($row = 0; $row -lt $gridHeight; $row++) {
         for ($col = 0; $col -lt $gridWidth; $col++) {
 
             if ($grid[$row][$col] -eq 1) {
-                $null = $frame.Append('#')
+                $null = $frame.Append('@') # like print
             } else {
                 $null = $frame.Append(' ')
             }
         }
-        $null = $frame.AppendLine()
+        $null = $frame.AppendLine() # like println
     }
 
     Write-Host $frame.ToString() -NoNewline
@@ -117,12 +120,12 @@ function Show-Grid {
 Clear-Host
 [Console]::CursorVisible = $false    
 
-$grid = New-RandomGrid               
+$grid = New-RandomGrid
 
 for ($gen = 1; $gen -le $totalGens; $gen++) {
-    Show-Grid -grid $grid -generation $gen         
-    $grid = Get-NextGeneration -currentGrid $grid   
-    Start-Sleep -Milliseconds $pauseMs              
+    Show-Grid -grid $grid -generation $gen  
+    $grid = Get-NextGeneration -currentGrid $grid
+    Start-Sleep -Milliseconds $pauseMs
 }
 
 [Console]::CursorVisible = $true     
