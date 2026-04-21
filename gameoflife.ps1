@@ -1,4 +1,4 @@
-
+#copyright (c) 2026 Ruslan Belous
 param(
     [int]$gridWidth  = 40,    
     [int]$gridHeight = 20,
