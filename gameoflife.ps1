@@ -1,4 +1,4 @@
-#copyright (c) 2026 Ruslan Belous
+# Copyright (c) 2026 Ruslan Belous #
 param(
     [int]$gridWidth  = 40,    
     [int]$gridHeight = 20,
@@ -8,6 +8,24 @@ $totalGens      = 500
 $pauseMs        = 20    
 $liveCellCounter = 0
 
+$letterFilePath = Join-Path $PSScriptRoot "letters.ps1"
+if (Test-Path $letterFilePath) { . $letterFilePath } else { Write-Error "Missing letters.ps1"; return }
+
+function New-EmptyGrid {
+    $grid = @()   
+
+    for ($row = 0; $row -lt $gridHeight; $row++) {
+        $currentRow = @()   
+
+        for ($col = 0; $col -lt $gridWidth; $col++) {
+            $currentRow += 0
+        }
+
+        $grid += , $currentRow
+    }
+
+    return $grid
+}
 
 function New-RandomGrid {
     $grid = @()   
@@ -23,6 +41,17 @@ function New-RandomGrid {
     }
 
     return $grid
+}
+
+function New-PresetGrid {
+    param(
+        [int]$charWidth = 3
+    )
+    $grid = New-EmptyGrid
+    $startX = [int][Math]::Max(0, ($gridWidth - ($title.Length * $charWidth)) / 2)
+    $startY = [int][Math]::Max(0, ($gridHeight - 7) / 2) 
+    Write-Host $StartX -ForegroundColor Red
+    Write-Host $StartY -ForegroundColor Red
 }
 
 
@@ -100,13 +129,12 @@ function Show-Grid {
 
 
     $frame = [System.Text.StringBuilder]::new()
-
-    $null = $frame.appendLine("Game of life")
     for ($row = 0; $row -lt $gridHeight; $row++) {
         for ($col = 0; $col -lt $gridWidth; $col++) {
 
             if ($grid[$row][$col] -eq 1) {
                 $null = $frame.Append('@') # like print
+                $liveCellCounter += 1 
             } else {
                 $null = $frame.Append(' ')
             }
@@ -114,7 +142,12 @@ function Show-Grid {
         $null = $frame.AppendLine() # like println
     }
 
+    
+    $displayString = $frame.ToString()
+    $header = "Game of life: gen: " + $generation + " - " + $liveCellCounter + " live cells "
+    Write-Host $header -ForegroundColor Cyan
     Write-Host $frame.ToString() -NoNewline
+    #Write-Host ($displayString.Substring($displayString.IndexOf("`n") + 1)) -NoNewline
 }
 
 
@@ -126,6 +159,7 @@ Clear-Host
 $grid = New-RandomGrid
 
 for ($gen = 1; $gen -le $totalGens; $gen++) {
+    New-PresetGrid -charWidth 5
     Show-Grid -grid $grid -generation $gen  
     $grid = Get-NextGeneration -currentGrid $grid
     Start-Sleep -Milliseconds $pauseMs
