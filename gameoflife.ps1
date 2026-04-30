@@ -52,8 +52,14 @@ function New-PresetGrid {
     $startY = [int][Math]::Max(0, ($gridHeight - 7) / 2) 
     Write-Host $StartX -ForegroundColor Red
     Write-Host $StartY -ForegroundColor Red
-    for ($i = $startX; $i -le $gridWidth; $i++){
+    for ($row = 0; $row -lt $gridHeight; $row++) {
+        $currentRow = @()   
 
+        for ($col = 0; $col -lt $gridWidth; $col++) {
+            $currentRow += Get-Random -Minimum 0 -Maximum 2
+        }
+
+        $grid += , $currentRow
     }
 }
 
